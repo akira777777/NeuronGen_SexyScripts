@@ -1,0 +1,34 @@
+# Python / AI тяжелые зависимости — не нужны на Vercel
+__pycache__/
+*.py[cod]
+*.pyd
+.Python
+models/
+*.ckpt
+*.safetensors
+*.pt
+*.pth
+*.onnx
+
+# Virtual envs
+venv/
+.venv/
+env/
+
+# Node
+node_modules/
+myapp/node_modules/
+
+# Большие папки проекта
+results/
+poses/
+docs/
+.pytest_cache/
+.git/
+
+# Env
+.env
+.env.local
+
+# Логи
+*.log

@@ -835,17 +835,22 @@ def build_interface() -> gr.Blocks:
         # Запуск основной генерации
         
         def on_profile_change(choice: str):
-            key = "realism" if choice and ("Realism" in choice or "Quality" in choice or "качеств" in choice.lower()) else "speed"
-            prof = get_profile(key)
+            # get_profile already maps emoji Gradio labels -> speed/realism
+            prof = get_profile(choice or "realism")
             return (
-                float(prof.get("cfg_scale", 6.0 if key == "realism" else 7.0)),
-                int(prof.get("steps", 28 if key == "realism" else 20)),
+                float(prof.get("cfg_scale", 6.0)),
+                int(prof.get("steps", 28)),
                 str(prof.get("sampler", "DPM++ 2M Karras")),
             )
 
         profile_radio.change(
             fn=on_profile_change,
             inputs=[profile_radio],
+            outputs=[cfg_slider, steps_slider, sampler_dropdown],
+        )
+        demo.load(
+            fn=lambda: on_profile_change("Realism / Quality"),
+            inputs=None,
             outputs=[cfg_slider, steps_slider, sampler_dropdown],
         )
 
