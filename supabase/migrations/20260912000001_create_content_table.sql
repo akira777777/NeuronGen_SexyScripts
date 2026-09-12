@@ -22,12 +22,12 @@ CREATE INDEX IF NOT EXISTS idx_content_public ON content(is_public) WHERE is_pub
 
 -- 3. Функция автообновления updated_at
 CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS `$`$
+RETURNS TRIGGER AS $$
 BEGIN
   NEW.updated_at = NOW();
   RETURN NEW;
 END;
-`$`$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
 
 -- Trigger
 DROP TRIGGER IF EXISTS content_updated_at ON content;
