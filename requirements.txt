@@ -1,0 +1,36 @@
+torch==2.3.0
+torchvision==0.18.0
+torchaudio==2.3.0
+diffusers==0.27.2
+transformers==4.41.0
+accelerate==0.32.0
+omegaconf==2.3.0
+einops==0.8.0
+safetensors==0.4.3
+pillow==10.3.0
+numpy==1.26.4
+pyyaml==6.0.1
+requests==2.32.3
+tqdm==4.66.4
+opencv-python==4.10.0.84
+imageio==2.35.1
+scipy==1.14.1
+Pillow==10.3.0
+
+# Для WebUI (Automatic1111) — обновлённые версии для Python 3.12
+gradio==4.41.0
+flask==3.0.3
+websockets==12.0
+aiohttp==3.9.5
+uvicorn==0.30.6
+fastapi==0.112.0
+
+# Для ControlNet — используем последнюю совместимую версию для Python 3.12
+controlnet_aux==0.0.10
+
+# Для ESRGAN (апскейл) — альтернатива real-esrgan
+realesrgan==0.3.0
+facexlib==0.3.0
+
+# Опционально: для ComfyUI
+comfyui-cli==0.1.1

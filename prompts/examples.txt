@@ -1,0 +1,58 @@
+# ==============================================================================
+# 👑 JUGGERNAUT XL & ONLYFANS PHOTOREALISM PROMPT GUIDE
+# ==============================================================================
+# Juggernaut XL (RunDiffusion / Damian036) utilizes natural language prompting.
+# DO NOT use old SD 1.5 Danbooru tags like "(masterpiece, best quality:1.4)".
+# High weights cause oversaturation, plastic skin, and clipping in SDXL.
+# Instead, describe the shot like a director: Subject + Outfit + Setting + Camera & Light.
+# ==============================================================================
+
+## ⚙️ Recommended Generation Parameters for Juggernaut XL:
+# - Sampler: DPM++ 2M Karras or DPM++ SDE Karras
+# - Sampling Steps: 25 - 35
+# - CFG Scale: 4.5 - 6.5 (Sweet spot: 5.5 - 6.0)
+# - Portrait Resolution: 896x1152 or 832x1216 (9:16 aspect ratio)
+# - Square Resolution: 1024x1024
+
+## 🚫 Juggernaut XL Universal Negative Prompt:
+# (worst quality, low quality, normal quality, lowres:1.2), (monochrome, grayscale:1.1), (3d render, cgi, cartoon, anime, illustration, sketch, drawing, painting:1.2), deformed, bad anatomy, bad hands, missing limbs, extra limbs, extra fingers, mutated fingers, fused fingers, poorly drawn hands, poorly drawn face, disfigured, blurry, oversaturated, plastic skin, airbrushed, unnatural body proportions, watermark, text, signature
+
+---
+
+## 📱 1. Authentic OnlyFans Bedroom Selfie (Candid & Intimate)
+candid iPhone selfie photograph of a gorgeous 21-year-old slavic woman, athletic toned body, natural blonde wavy hair cascading over shoulders, piercing blue eyes, gentle playful smile, wearing an unbuttoned oversized silk white shirt over a delicate black lace bralette, messy luxury bedroom with wrinkled satin sheets, soft morning golden hour sunlight streaming through window, natural skin texture, visible fine pores and delicate skin details, authentic smartphone camera angle, arm extended, intimate candid atmosphere, 35mm film aesthetic, photorealistic
+
+---
+
+## 🪞 2. Bathroom Mirror Selfie (Viral Social Media Style)
+candid mirror selfie photograph of an alluring 22-year-old latina woman, curvy hourglass figure, smooth sun-kissed tan skin, voluminous dark brown wavy hair, hazel eyes, natural lips, wearing a matching ribbed seamless sports crop top and cheeky micro shorts showing toned abs, standing in a contemporary marble bathroom, holding iPhone in hand taking mirror photo, clear glass reflection, soft ambient vanity illumination, realistic skin pores and contours, natural highlights, high-end social media aesthetic, photorealistic
+
+---
+
+## 🔥 3. Sensual Boudoir Studio (VIP / PPV Editorial Quality)
+cinematic boudoir fashion portrait of a 20-year-old european woman, porcelain pale skin, ginger red hair, emerald green eyes, light delicate freckles, slim fit physique, wearing an intricate sheer black floral lace bodysuit with garter belt and thigh-high stockings, seated on a vintage velvet couch in a luxury dark penthouse, atmospheric warm ambient rim lighting, soft dramatic shadows, shot on 50mm f/1.4 prime lens, Hasselblad medium format photography, rich dynamic range, ultra-detailed skin pores and realistic fabric weave
+
+---
+
+## 💪 4. Gym & Fitness Influencer (Lifestyle & Spandex)
+candid front camera smartphone selfie of an athletic 23-year-old fitness model, toned abs, slender waist, sleek ponytail, subtle glow of perspiration on collarbone, wearing charcoal grey skin-tight seamless yoga leggings and matching sports bra, sitting on a workout bench in a modern boutique gym with warm ambient studio lighting, authentic gym influencer casual snap, realistic skin micro-details, natural lighting, photorealistic
+
+---
+
+## 🏖️ 5. Exotic Beach & Infinity Pool (Luxury Vacation Bikini)
+candid sun-drenched photograph of a gorgeous 22-year-old woman, sun-kissed golden skin with glistening water droplets, natural hourglass body, wavy beach-textured hair, wearing a sleek micro triangle bikini, leaning on the edge of a luxury infinity pool overlooking turquoise ocean water, bright natural sunlight, lens flare, 85mm portrait photography, f/2.0, creamy bokeh background, authentic skin pores, photorealistic masterpiece
+
+---
+
+## 🚿 6. Steamy Shower & Bath (Sensual Wet Aesthetic)
+candid portrait of a 22-year-old brunette beauty in a glass luxury shower, wet dark hair slicked back, water droplets running down smooth collarbone and shoulders, steamy frosted glass reflections, soft warm diffused bathroom light, natural wet skin texture, gentle captivating direct eye contact, cinematic 35mm photography, shallow depth of field, intimate atmosphere
+
+---
+
+## 🏙️ 7. Penthouse Balcony Night Glamour
+cinematic nighttime photograph of a glamorous 24-year-old model on a high-rise penthouse glass balcony, blurred glowing city skyline in background, wearing an elegant plunging backless satin slip dress, natural skin texture, gentle city neon rim lighting illuminating her silhouette, shot on 85mm f/1.4 lens, low light photography, authentic film grain, photorealistic
+
+---
+
+## ☕ 8. Cozy Sunday Morning Coffee (Wholesome & Teasing)
+candid indoor photo of a cute 21-year-old brunette girl sitting cross-legged on a fluffy rug holding a ceramic coffee mug, wearing an oversized chunky knitted pastel sweater and thigh-high knit socks, smiling softly at camera, warm living room sunlight pouring in, natural skin, freckles, soft cozy aesthetic, 35mm documentary photography

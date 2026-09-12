@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+
+# Model checkpoints (large binary files >2GB)
+models/checkpoints/*.safetensors
+models/checkpoints/*.ckpt
+models/checkpoints/*.pt
+models/checkpoints/*.bin
+models/ESRGAN/*.pth
+
+# Generated outputs & results (exclude actual generated images from version control)
+results/*.png
+results/*.jpg
+results/*.json
+!results/.gitkeep
+
+# Environment variables & API keys
+.env
+.env.local
+*.key
+
+# IDE & OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

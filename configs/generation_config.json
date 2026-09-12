@@ -1,0 +1,55 @@
+{
+  "version": "2.3",
+  "checkpoint": {
+    "name": "Juggernaut_XL_v9.safetensors",
+    "url": "https://huggingface.co/Damian036/Juggernaut_XL_v9/resolve/main/Juggernaut_XL_v9.safetensors",
+    "path": "models/checkpoints/Juggernaut_XL_v9.safetensors"
+  },
+  "fallback_checkpoint": {
+    "name": "RealisticVisionV60B3_v40VAE.safetensors",
+    "url": "https://huggingface.co/RealVisXL/RealisticVisionV60B3_v40VAE/resolve/main/RealisticVisionV60B3_v40VAE.safetensors",
+    "path": "models/checkpoints/RealisticVisionV60B3_v40VAE.safetensors"
+  },
+  "webui_api": {
+    "enabled": true,
+    "host": "http://127.0.0.1:7860",
+    "timeout": 300
+  },
+  "generation": {
+    "steps": 35,
+    "cfg_scale": 8.0,
+    "width": 896,
+    "height": 1152,
+    "sampler_name": "DPM++ 2M Karras",
+    "seed": null
+  },
+  "batch": {
+    "size": 1,
+    "max_memory_mb": 4096
+  },
+  "models": {
+    "controlnet_openpose": {
+      "name": "control_v11e_sd15_openpose.pth",
+      "url": "https://huggingface.co/lllyasviel/control_v11e_sd15_openpose/resolve/main/control_v11e_sd15_openpose.pth",
+      "path": "models/controlnet/control_v11e_sd15_openpose.pth"
+    },
+    "upscale_esrgan": {
+      "name": "4x-UltraSharp.onnx",
+      "url": "https://huggingface.co/guoyww/4x-UltraSharp/resolve/main/4x-UlaSharp.onnx",
+      "path": "models/ESRGAN/4x-UltraSharp.onnx"
+    }
+  },
+  "prompts": {
+    "default": "best_quality_prompt.txt",
+    "variants": [
+      "sexy_variant.txt",
+      "sexy_variant2.txt"
+    ]
+  },
+  "output": {
+    "directory": "results",
+    "filename_format": "image_{timestamp}.png",
+    "metadata": true,
+    "upscale": false
+  }
+}
