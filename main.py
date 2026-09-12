@@ -270,6 +270,7 @@ def generate_single_ui(
     sampler_name: str,
     webui_host: str,
     profile_name: str = "realism",
+    grok_enabled: bool = False,
     progress=gr.Progress()
 ) -> Tuple[List[Image.Image], str]:
     """Универсальный диспетчер генерации с подробным информированием на русском языке."""
@@ -868,7 +869,8 @@ def build_interface() -> gr.Blocks:
                 seed_input,
                 sampler_dropdown,
                 webui_host_input,
-                profile_radio
+                profile_radio,
+                grok_enabled,
             ],
             outputs=[output_gallery, output_status]
         )
