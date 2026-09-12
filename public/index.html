@@ -4,35 +4,370 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NeuronGen — AI Content Studio</title>
+  <meta name="description" content="AI-generated content platform. Browse exclusive neural-art creations.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: #0a0a0f;
-      color: #fff;
-      font-family: "Segoe UI", system-ui, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+    :root {
+      --bg:        #08080f;
+      --surface:   #111120;
+      --border:    rgba(255,255,255,0.07);
+      --purple:    #a855f7;
+      --pink:      #ec4899;
+      --grad:      linear-gradient(135deg, #a855f7, #ec4899);
+      --text:      #f0f0f5;
+      --muted:     #6b6b80;
+      --card-bg:   #13131f;
     }
-    .hero { text-align: center; padding: 2rem; }
-    h1 { font-size: 3rem; background: linear-gradient(135deg, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    p { color: #888; margin-top: 1rem; font-size: 1.1rem; }
-    .status { margin-top: 2rem; padding: 1rem 2rem; background: #1a1a2e; border-radius: 12px; border: 1px solid #333; }
-    .status span { color: #4ade80; }
-    a { color: #a855f7; text-decoration: none; }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE overlay ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: .4;
+    }
+
+    /* ── GLOW blobs ── */
+    .blob {
+      position: fixed; border-radius: 50%; filter: blur(120px);
+      pointer-events: none; z-index: 0;
+    }
+    .blob-1 { width:500px; height:500px; background: rgba(168,85,247,.18); top:-100px; left:-100px; animation: drift 12s ease-in-out infinite alternate; }
+    .blob-2 { width:400px; height:400px; background: rgba(236,72,153,.14); bottom:-80px; right:-80px; animation: drift 15s ease-in-out infinite alternate-reverse; }
+    @keyframes drift { to { transform: translate(60px, 40px); } }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top:0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 2rem;
+      background: rgba(8,8,15,.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .logo {
+      font-size: 1.3rem; font-weight: 700; letter-spacing: -.02em;
+      background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .nav-pill {
+      display: flex; align-items: center; gap: .4rem;
+      font-size: .78rem; color: var(--muted);
+      background: var(--surface); border: 1px solid var(--border);
+      padding: .35rem .9rem; border-radius: 999px;
+    }
+    .dot { width:7px; height:7px; border-radius:50%; background:#4ade80; animation: pulse 2s ease infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:.4;} }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative; z-index: 1;
+      text-align: center; padding: 5rem 1.5rem 3rem;
+    }
+    .badge {
+      display: inline-flex; align-items: center; gap: .5rem;
+      font-size: .75rem; font-weight: 500; letter-spacing: .08em; text-transform: uppercase;
+      color: var(--purple);
+      background: rgba(168,85,247,.1); border: 1px solid rgba(168,85,247,.25);
+      padding: .35rem 1rem; border-radius: 999px; margin-bottom: 1.5rem;
+    }
+    h1 {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 700; letter-spacing: -.03em; line-height: 1.1;
+    }
+    h1 span { background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .subtitle {
+      margin: 1.2rem auto 0; max-width: 520px;
+      font-size: 1.05rem; color: var(--muted); line-height: 1.65;
+    }
+    .stats {
+      display: flex; justify-content: center; gap: 3rem;
+      margin: 2.5rem 0; flex-wrap: wrap;
+    }
+    .stat { text-align: center; }
+    .stat-num { font-size: 2rem; font-weight: 700; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .stat-label { font-size: .8rem; color: var(--muted); margin-top: .15rem; }
+
+    /* ── SECTION ── */
+    section { position: relative; z-index: 1; padding: 1rem 2rem 4rem; max-width: 1400px; margin: 0 auto; }
+    .section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+    .section-title { font-size: 1.25rem; font-weight: 600; }
+    .section-sub { font-size: .85rem; color: var(--muted); margin-top: .2rem; }
+    .filter-bar { display:flex; gap:.5rem; flex-wrap:wrap; }
+    .filter-btn {
+      font-size: .8rem; padding: .4rem 1rem; border-radius: 999px; border: 1px solid var(--border);
+      background: var(--surface); color: var(--muted); cursor: pointer;
+      transition: all .2s;
+    }
+    .filter-btn.active, .filter-btn:hover {
+      background: rgba(168,85,247,.15); border-color: rgba(168,85,247,.4); color: var(--text);
+    }
+
+    /* ── GRID ── */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.25rem;
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px; overflow: hidden;
+      transition: transform .25s ease, box-shadow .25s ease, border-color .25s;
+      cursor: pointer;
+      animation: fadeUp .5s ease both;
+    }
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 60px rgba(168,85,247,.15);
+      border-color: rgba(168,85,247,.3);
+    }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(24px);} to{opacity:1;transform:translateY(0);} }
+    .card:nth-child(1){animation-delay:.05s}
+    .card:nth-child(2){animation-delay:.1s}
+    .card:nth-child(3){animation-delay:.15s}
+    .card:nth-child(4){animation-delay:.2s}
+    .card:nth-child(5){animation-delay:.25s}
+    .card:nth-child(6){animation-delay:.3s}
+
+    .card-img {
+      width:100%; aspect-ratio:4/3; object-fit:cover;
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      display:flex; align-items:center; justify-content:center;
+      font-size:3rem; position:relative; overflow:hidden;
+    }
+    .card-img img { width:100%; height:100%; object-fit:cover; position:absolute; inset:0; }
+    .card-img .placeholder {
+      font-size: 2.5rem;
+      background: linear-gradient(135deg, rgba(168,85,247,.2), rgba(236,72,153,.2));
+      width:100%; height:100%; display:flex; align-items:center; justify-content:center;
+    }
+    .card-body { padding: 1rem 1.1rem 1.2rem; }
+    .card-title { font-size: .95rem; font-weight: 600; line-height: 1.3; }
+    .card-desc { font-size: .8rem; color: var(--muted); margin-top: .4rem; line-height: 1.5; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .card-footer { display:flex; align-items:center; justify-content:space-between; margin-top: .9rem; }
+    .badge-pub {
+      font-size: .7rem; padding: .2rem .6rem; border-radius: 999px;
+      background: rgba(74,222,128,.1); color: #4ade80; border: 1px solid rgba(74,222,128,.2);
+    }
+    .card-date { font-size: .72rem; color: var(--muted); }
+
+    /* ── SKELETON ── */
+    .skeleton { background: linear-gradient(90deg, #1a1a2e 25%, #1f1f35 50%, #1a1a2e 75%); background-size:200% 100%; animation: shimmer 1.4s infinite; border-radius: 8px; }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+    .sk-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; overflow:hidden; }
+    .sk-img  { width:100%; aspect-ratio:4/3; }
+    .sk-body { padding:1rem; }
+    .sk-line { height:14px; margin-bottom:.7rem; border-radius:4px; }
+    .sk-line.short { width:60%; }
+
+    /* ── EMPTY / ERROR ── */
+    .empty { text-align:center; padding: 4rem 1rem; color: var(--muted); grid-column:1/-1; }
+    .empty-icon { font-size: 3.5rem; margin-bottom: 1rem; opacity: .4; }
+    .empty h3 { font-size: 1.1rem; color: var(--text); margin-bottom: .5rem; }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      display:none; position:fixed; inset:0; z-index:200;
+      background: rgba(0,0,0,.75); backdrop-filter: blur(8px);
+      align-items:center; justify-content:center; padding:1rem;
+    }
+    .modal-overlay.open { display:flex; }
+    .modal {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 20px; max-width: 560px; width:100%; padding:1.5rem;
+      animation: modalIn .2s ease;
+    }
+    @keyframes modalIn { from{opacity:0;transform:scale(.95);} to{opacity:1;transform:scale(1);} }
+    .modal-head { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem; }
+    .modal-title { font-size:1.1rem; font-weight:600; }
+    .modal-close { background:none; border:none; color:var(--muted); font-size:1.5rem; cursor:pointer; line-height:1; }
+    .modal-close:hover { color:var(--text); }
+    .modal-img { width:100%; border-radius:12px; margin-bottom:1rem; aspect-ratio:16/9; object-fit:cover; background:#1a1a2e; display:flex; align-items:center; justify-content:center; font-size:4rem; }
+    .modal-desc { font-size:.9rem; color:var(--muted); line-height:1.6; }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative; z-index:1;
+      text-align:center; padding:2rem; color:var(--muted); font-size:.8rem;
+      border-top: 1px solid var(--border);
+    }
+    footer a { color: var(--purple); text-decoration:none; }
+
+    @media(max-width:600px){
+      nav { padding:.8rem 1rem; }
+      section { padding:1rem 1rem 3rem; }
+      .stats { gap:2rem; }
+      h1 { font-size:2.2rem; }
+    }
   </style>
 </head>
 <body>
-  <div class="hero">
-    <h1>NeuronGen Studio</h1>
-    <p>AI-powered content generation platform</p>
-    <div class="status">
-      API: <a href="/api/health">/api/health</a> &nbsp;|&nbsp;
-      Content: <a href="/api/content">/api/content</a> &nbsp;|&nbsp;
-      DB: <span>Supabase Connected ✓</span>
+
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">NeuronGen ✦</div>
+  <div class="nav-pill">
+    <span class="dot"></span>
+    Live — Supabase connected
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="badge">✦ AI-Generated Content</div>
+  <h1>Explore <span>Neural Art</span><br>Like Never Before</h1>
+  <p class="subtitle">
+    AI-powered content studio. Every image is generated with state-of-the-art diffusion models.
+  </p>
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-num" id="stat-count">—</div>
+      <div class="stat-label">Creations</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">∞</div>
+      <div class="stat-label">Styles</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">4K</div>
+      <div class="stat-label">Resolution</div>
     </div>
   </div>
+</div>
+
+<!-- GALLERY -->
+<section>
+  <div class="section-header">
+    <div>
+      <div class="section-title">Latest Creations</div>
+      <div class="section-sub">Public gallery — updated in real-time</div>
+    </div>
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="filterContent('all', this)">All</button>
+      <button class="filter-btn" onclick="filterContent('recent', this)">New</button>
+    </div>
+  </div>
+  <div class="grid" id="gallery">
+    <!-- Skeletons -->
+    <div class="sk-card"><div class="sk-img skeleton"></div><div class="sk-body"><div class="sk-line skeleton"></div><div class="sk-line short skeleton"></div></div></div>
+    <div class="sk-card"><div class="sk-img skeleton"></div><div class="sk-body"><div class="sk-line skeleton"></div><div class="sk-line short skeleton"></div></div></div>
+    <div class="sk-card"><div class="sk-img skeleton"></div><div class="sk-body"><div class="sk-line skeleton"></div><div class="sk-line short skeleton"></div></div></div>
+  </div>
+</section>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="modal-title"></div>
+      <button class="modal-close" onclick="document.getElementById('modal').classList.remove('open')">×</button>
+    </div>
+    <div class="modal-img" id="modal-img"></div>
+    <div class="modal-desc" id="modal-desc"></div>
+  </div>
+</div>
+
+<footer>
+  Built with ❤️ using <a href="https://supabase.com" target="_blank">Supabase</a> + <a href="https://vercel.com" target="_blank">Vercel</a>
+  &nbsp;·&nbsp; NeuronGen Studio &copy; 2026
+</footer>
+
+<script>
+  let allContent = [];
+  const EMOJIS = ['🌸','✨','💜','🔮','🌙','⚡','🎭','🌺','💫','🦋'];
+
+  async function loadContent() {
+    try {
+      const r = await fetch('/api/content');
+      const { data } = await r.json();
+      allContent = data || [];
+      document.getElementById('stat-count').textContent = allContent.length || '0';
+      renderCards(allContent);
+    } catch(e) {
+      document.getElementById('gallery').innerHTML =
+        '<div class="empty"><div class="empty-icon">⚠️</div><h3>Failed to load</h3><p>Check API connection</p></div>';
+    }
+  }
+
+  function renderCards(items) {
+    const grid = document.getElementById('gallery');
+    if (!items.length) {
+      grid.innerHTML = '<div class="empty"><div class="empty-icon">🌸</div><h3>Gallery is empty</h3><p>Content will appear here once published</p></div>';
+      return;
+    }
+    grid.innerHTML = items.map((item, i) => {
+      const emoji = EMOJIS[i % EMOJIS.length];
+      const date  = new Date(item.created_at).toLocaleDateString('ru-RU', {day:'numeric', month:'short'});
+      const img   = item.image_url
+        ? `<img src="${item.image_url}" alt="${item.title}" loading="lazy" onerror="this.style.display='none'">`
+        : `<div class="placeholder">${emoji}</div>`;
+      return `
+        <div class="card" onclick="openModal(${i})" style="animation-delay:${i*0.06}s">
+          <div class="card-img">${img}</div>
+          <div class="card-body">
+            <div class="card-title">${item.title}</div>
+            ${item.description ? `<div class="card-desc">${item.description}</div>` : ''}
+            <div class="card-footer">
+              <span class="badge-pub">✓ Public</span>
+              <span class="card-date">${date}</span>
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function filterContent(type, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    if (type === 'recent') {
+      const week = Date.now() - 7*24*3600*1000;
+      renderCards(allContent.filter(c => new Date(c.created_at) > week));
+    } else {
+      renderCards(allContent);
+    }
+  }
+
+  function openModal(i) {
+    const item = allContent[i];
+    const emoji = '🔮';
+    document.getElementById('modal-title').textContent = item.title;
+    document.getElementById('modal-desc').textContent  = item.description || 'No description';
+    const mi = document.getElementById('modal-img');
+    mi.innerHTML = item.image_url
+      ? `<img src="${item.image_url}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">`
+      : emoji;
+    document.getElementById('modal').classList.add('open');
+  }
+
+  function closeModal(e) {
+    if (e.target.id === 'modal') document.getElementById('modal').classList.remove('open');
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') document.getElementById('modal').classList.remove('open');
+  });
+
+  loadContent();
+  // Auto-refresh every 30s
+  setInterval(loadContent, 30000);
+</script>
 </body>
 </html>
