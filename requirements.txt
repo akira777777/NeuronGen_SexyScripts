@@ -15,7 +15,6 @@ tqdm==4.66.4
 opencv-python==4.10.0.84
 imageio==2.35.1
 scipy==1.14.1
-Pillow==10.3.0
 
 # Для WebUI (Automatic1111) — обновлённые версии для Python 3.12
 gradio==4.41.0
@@ -34,3 +33,6 @@ facexlib==0.3.0
 
 # Опционально: для ComfyUI
 comfyui-cli==0.1.1
+
+# Long-prompt encoding for SDXL / attention weights
+compel>=2.0.2

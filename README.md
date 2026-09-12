@@ -1,189 +1,156 @@
-# 🎨 NeuronGen Studio v2.3 (Photorealistic OnlyFans Edition)
+# 🎨 NeuronGen Studio v2.2 (High-Performance Edition)
 
-Высокопроизводительный комплекс для генерации **фотореалистичных изображений** в стиле OnlyFans через **Automatic1111 WebUI**, **ComfyUI**, **PyTorch Diffusers** и встроенный **Demo Studio**.
+Комплекс для создания ультра-реалистичных фотографий нейросетью, оптимизированный под видеокарту **NVIDIA GeForce RTX 4070 Ti**, с поддержкой встроенной автономной студии, внешнего **Automatic1111 WebUI** и мгновенного тестового режима.
 
 ---
 
-## 📦 Структура проекта
+## ⚡ Быстрый старт для простого пользователя (в 1 клик)
+
+Вам больше не нужно вводить сложные команды в консоль!
+
+### Вариант 1: Запуск красивой веб-студии (Рекомендуется)
+1. Дважды кликните по файлу **`start_studio.bat`** (или `start_studio.bat`).
+2. В браузере автоматически откроется окно студии по адресу: **http://127.0.0.1:7861**.
+3. Выберите понравившийся сюжет из выпадающего списка (например, *«Селфи в спальне»* или *«Пляж и бикини»*).
+4. Нажмите большую фиолетовую кнопку **`🚀 СГЕНЕРИРОВАТЬ ФОТО`**!
+5. Чтобы сразу посмотреть созданные картинки на компьютере, нажмите кнопку **`📂 Открыть папку с готовыми фото`**.
+
+### Вариант 2: Простое консольное меню
+1. Дважды кликните по файлу **`start_cli.bat`** (или `start_cli.bat`).
+2. Нажмите цифру `[2]`, чтобы выбрать готовый сюжет, или `[3]`, чтобы написать свой текст.
+
+---
+
+## 🌟 Возможности веб-студии (main.py)
+
+Всё управление переведено на понятный русский язык:
+
+- **⚡ Режимы генерации**:
+  - `⚡ Локальная видеокарта (RTX 4070 Ti — Быстро и автономно)`: работает прямо на вашей видеокарте, модель `Realistic_Vision_V5.1` уже установлена и готова!
+  - `🎨 Демо-режим`: мгновенное превью без нагрузки на видеокарту.
+  - `🌐 Внешний сервер Automatic1111 WebUI`: если вы запускаете отдельный сервер A1111 на порту 7860.
+- **📁 Готовые сюжеты в 1 клик**:
+  - 📱 *Селфи в спальне* (Шёлковая рубашка, утренний золотистый свет)
+  - 🪞 *Селфи у зеркала в ванной* (Спортивный топ, мрамор, ринглайт)
+  - 🏖️ *Пляж и бассейн* (Бикини, тропический курорт, загар)
+  - 🔥 *Чувственный будуар* (Кружевное боди, киносвет)
+  - 💪 *Фитнес в спортзале* (Леггинсы, спортивная фигура)
+  - 💎 *Шедевр качества* (Универсальный ультра-фотореализм)
+- **💃 Выбор типажа внешности девушки в 1 клик**:
+  - 👱‍♀️ Славянка (Блондинка, голубые глаза, нежная улыбка)
+  - 👩 Латина (Загар, брюнетка, выразительные черты)
+  - 👩‍🦰 Скандинавка (Рыжая, веснушки, фарфоровая кожа)
+  - 👧 Азиатка (Нежный утонченный образ)
+- **📐 Форматы кадра в 1 клик**:
+  - 📱 *Портрет для телефона* (512x768) — идеально для сторис и смартфонов.
+  - 📸 *Квадрат для соцсетей* (512x512) — классический формат постов.
+  - 🖥️ *Горизонтальный кадр* (768x512) — широкий план и пейзаж.
+  - 🌟 *Высокое разрешение HD* (896x1152) — повышенная детализация.
+- **🛡️ Защита от дефектов**: встроенный негативный фильтр исключает деформации пальцев, пластиковую кожу, размытие и водяные знаки.
+- **📂 Удобный просмотр результатов**: кнопка прямо в интерфейсе моментально открывает папку с сохранёнными файлами в проводнике Windows.
+- **✨ Умный ассистент Grok AI**: при наличии ключа xAI генерирует авторские промпты и готовые подписи к постам в соцсетях.
+- **💬 Импорт из Discord / Midjourney**: просто скопируйте команду из Discord — студия автоматически очистит лишние флаги и настроит правильный размер.
+
+---
+
+## 💻 Использование через консоль (для опытных пользователей)
+
+Если вы хотите запускать генерацию через командную строку:
+
+### Базовые команды (ONLYFANS ОПТИМИЗАЦИЯ)
+
+```bash
+# Тестовая проверка генерации (мгновенно, без GPU)
+python generate.py --prompt "prompts/best_quality_prompt.txt" --engine demo
+
+# ONLYFANS оптимизация: 9:16 вертикальный формат для мобильных устройств
+python generate.py --prompt "prompts/onlyfans_vertical_portrait.txt" --width 1080 --height 1920
+
+# Juggernaut XL v9 с ультра-параметрами для фотореализма
+python generate.py --prompt "prompts/onlyfans_boudoir_lingerie.txt" --steps 35 --cfg 8.0 --sampler "DPM++ SDE Karras"
+
+# Batch-генерация: сразу 5 фото за один запрос (экономия времени)
+python generate.py --prompt "prompts/onlyfans_full_body_bikini.txt" --batch_size 5
+
+# Пакетная генерация ControlNet (один промпт на каждую позу)
+python generate.py --prompt "prompts/best_quality_prompt.txt" --controlnet_batch poses/*.png
+
+# Генерация с AI-улучшением промпта через Grok API
+python generate.py --grok_key YOUR_API_KEY --prompt "beautiful girl selfie"
+```### Управление моделями
+
+```bash
+# Список всех установленных моделей и их статус
+python generate.py list-models
+
+# Проверка доступности внешних серверов (WebUI / ComfyUI)
+python generate.py test-connection
+
+# Скачивание Juggernaut XL v9 чекпоинта (2.1 GB)
+python generate.py download-checkpoint
+
+# Скачивание ESRGAN 4x-UltraSharp для апскейла
+python generate.py download-esrgan
+```### ONLYFANS продвинутые параметры
+
+```bash
+# Вертикальный портрет для сторис (9:16)
+python generate.py --prompt "prompts/onlyfans_vertical_portrait.txt" --width 1080 --height 1920
+
+# Полный рост для пляжных фото
+python generate.py --prompt "prompts/onlyfans_full_body_bikini.txt" --batch_size 5
+
+# Boudoir с ультра-детализацией кожи (Juggernaut XL v9)
+python generate.py --prompt "prompts/onlyfans_boudoir_lingerie.txt" --steps 35 --cfg 8.0 --hires_fix
+
+# Fitness портрет в спортзале
+python generate.py --prompt "prompts/onlyfans_gym_fitness.txt" --width 1080 --height 1920
+
+# Beach sunset selfie с золотым часом освещения
+python generate.py --prompt "prompts/onlyfans_beach_sunset.txt" --batch_size 3
+
+# Автоматический апскейл 2x для HD OnlyFans постов
+python generate.py --prompt "..." --upscale esrgan_2x
+
+# Апскейл 4x для премиум-контента и печати
+python generate.py --prompt "..." --upscale esrgan_4x
+```
+
+---
+
+## 📁 Структура проекта
 
 ```
 NeuronGen_SexyScripts/
-├── main.py                  # Веб-интерфейс NeuronGen Studio (http://localhost:7861)
-├── generate.py              # Универсальный высокоскоростной CLI-генератор v2.3
-├── batch_generator.py       # Пакетный генератор с параллельным пулом и быстрым I/O
-├── webui_api.py             # Клиент с HTTP Keep-Alive пулом для A1111 и ComfyUI
-├── prompt_processor.py      # LRU-кэшированный парсер промптов (>120k промптов/сек)
-├── config.py                # Менеджер настроек (JSON)
-├── requirements.txt         # Зависимости Python
-├── configs/
-│   └── generation_config.json # Конфигурация генерации и адреса серверов
-├── prompts/                 # Готовые качественные шаблоны промптов для OnlyFans стиля
-├── models/                  # Чекпоинты, ControlNet и апскейлеры
-├── results/                 # Результаты генераций и сопутствующие метаданные
-└── tests/                   # Набор автоматических тестов и бенчмарков
+├── start_studio.bat # Запуск веб-студии в 1 клик
+├── start_cli.bat         # Консольное меню в 1 клик
+├── main.py                       # Веб-интерфейс студии (http://127.0.0.1:7861)
+├── generate.py                   # Генератор с интерактивным меню и CLI
+├── batch_generator.py            # Модуль для пакетной генерации серий
+├── prompt_processor.py           # Быстрый парсер промптов и тегов
+├── config.py                     # Менеджер настроек
+├── requirements.txt              # Зависимости Python
+├── configs/                      # Конфигурационные файлы JSON
+├── prompts/                      # ONLYFANS оптимизированные промпты:
+│   ├── best_quality_prompt.txt    # Универсальный ультра-реализм
+│   ├── onlyfans_bedroom_selfie.txt # Спальня, шёлк и кружево
+│   ├── onlyfans_boudoir_studio.txt # Люкс будуар с киносветом
+│   ├── onlyfans_mirror_selfie.txt # Ванная, спорт-топ и мидрифт
+│   ├── onlyfans_vertical_portrait.txt  # ⭐ Вертикальный портрет для сторис (9:16)
+│   ├── onlyfans_full_body_bikini.txt   # ⭐ Полный рост пляж/бикини
+│   ├── onlyfans_boudoir_lingerie.txt   # ⭐ Boudoir с кружевом и глубоким декольте
+│   ├── onlyfans_gym_fitness.txt        # ⭐ Спортзал, атлетичная фигура
+│   └── onlyfans_beach_sunset.txt       # ⭐ Пляж на закате, золотой час
+├── models/
+│   └── checkpoints/              # Модели генерации (.safetensors)
+├── results/                      # Все сгенерированные фото и метаданные
+└── tests/                        # Автоматические тесты комплекса
 ```
 
 ---
 
-## 🚀 Быстрый старт
-
-### 1. Установка зависимостей
+## 🧪 Запуск автоматических тестов
 
 ```bash
-cd C:/Users/novra/Desktop/NeuronGen_SexyScripts
-pip install -r requirements.txt
+python -m unittest discover tests
 ```
-
-### 2. Запуск веб-студии (Рекомендуется)
-
-```bash
-python main.py
-```
-Откройте в браузере: **http://127.0.0.1:7861**
-
-В интерфейсе доступны:
-- **⚡ Выбор движка генерации**:
-  - `Demo & Test Mode`: мгновенная генерация стилизованных превью без тяжёлых моделей и внешних серверов.
-  - `Automatic1111 WebUI API`: отправка запросов на сервер A1111 (http://127.0.0.1:7860).
-  - `Local Diffusers Pipeline`: прямая локальная генерация на PyTorch при наличии скачанного чекпоинта.
-- **📁 Шаблоны промптов**: мгновенная вставка промптов из `prompts/`.
-- **📊 Пакетный режим**: генерация по списку промптов.
-- **🔍 Диагностика**: мониторинг статуса видеокарты, серверов и моделей.
-
----
-
-## ⚡ Использование через консоль (CLI)
-
-### Генерация через Demo Mode (быстрая проверка)
-```bash
-python generate.py --prompt "prompts/best_quality_prompt.txt" --engine demo
-```
-
-### Генерация через Automatic1111 WebUI API
-```bash
-python generate.py --prompt "prompts/sexy_variant.txt" --engine webui --steps 35 --cfg 8.0
-```
-
-### Проверка подключения к серверам
-```bash
-python generate.py test-connection
-```
-
-### Список доступных моделей
-```bash
-python generate.py list-models
-```
-
----
-
-## 📸 Параметры для максимальной реалистичности и сексуальности
-
-### Рекомендуемые настройки (Juggernaut XL v9)
-
-| Параметр | Значение | Описание |
-|----------|----------|----------|
-| **Steps** | 35-40 | Больше шагов = больше деталей кожи, текстуры, реалистичность |
-| **CFG Scale** | 7.5-8.5 | Оптимальный баланс между следованием промпту и естественностью |
-| **Resolution** | 896x1152 или 768x1024 | Вертикальный формат для OnlyFans, SDXL нативная поддержка |
-| **Sampler** | DPM++ 2M Karras | Быстрый и стабильный сэмплер для фотореализма |
-
-### Ключевые элементы промптов для реалистичности:
-
-1. **Текстура кожи**: `(natural detailed skin texture with visible pores and subtle imperfections, goosebumps on arms:1.1)`
-2. **Освещение**: `(soft natural lighting creating dramatic shadows across curves, photorealistic catchlights in eyes:1.05)`
-3. **Камера/линза**: `shot on 85mm portrait lens f/1.4, creamy bokeh background`
-4. **Стиль фото**: `(raw photo, candid amateur photography, 8k uhd, dslr, high resolution:1.2)`
-
-### Negative Prompt (встроен в config.py):
-```
-(plastic skin, airbrushed, wax figure, CGI, 3D render, cartoon, anime, illustration:1.4), 
-(extra fingers, deformed hands, fused fingers, mutated limbs, cross-eyed, malformed eyes:1.4), 
-(worst quality, low quality, normal quality:1.3), 
-(monochrome, grayscale, bad anatomy, bad proportions, unnatural body, distorted features:1.2), 
-(overly symmetrical face, doll-like features, artificial lighting, studio perfection:1.1)
-```
-
----
-
-## 🏎️ Оптимизации производительности v2.3
-
-- **LRU-кэширование и Pre-compiled Regex**: парсинг промптов оптимизирован до **124,000+ операций в секунду**.
-- **HTTP Connection Pooling**: постоянная сессия с Keep-Alive и адаптерами пула (`requests.Session` + `HTTPAdapter`) устраняет задержки повторных TCP-хэндшейков.
-- **Sub-Millisecond Health Check**: быстрый сокет-тест портов возвращает статус недоступного сервера за доли миллисекунды без зависания на таймаутах.
-- **Fast Image I/O**: многопоточное сохранение PNG с оптимальным уровнем сжатия без потери качества.
-- **Zero-Crash Design**: отсутствие падений при отсутствии серверов или моделей — интерфейс всегда подсказывает оптимальный шаг.
-
----
-
-## 🧪 Запуск тестов и бенчмарков
-
-```bash
-python -m unittest tests/test_pipeline.py -v
-```
-
-### Тестирование OnlyFans стиля:
-```bash
-# Быстрый демо-тест
-python tests/test_photorealistic.py --engine demo --archetype latina_brunette --scenario bikini_poolside
-
-# Реальная генерация через WebUI API
-python tests/test_photorealistic.py --engine webui_api --archetype nordic_redhead --scenario mirror_selfie
-```
-
----
-
-## 📁 Промпты в prompts/директории
-
-| Файл | Описание |
-|------|----------|
-| `best_quality_prompt.txt` | Универсальный высококачественный промпт с акцентом на реалистичность |
-| `onlyfans_bedroom_selfie.txt` | Спальня, утреннее освещение, шелковая одежда |
-| `onlyfans_boudoir_studio.txt` | Студийная бодиуар фотография в роскошном интерьере |
-| `onlyfans_mirror_selfie.txt` | Ванная комната, зеркальное selfie с акцентом на фигуру |
-| `sexy_variant.txt` | Обнажённая лиingerie в спальне, драматическое освещение |
-| `sexy_variant2.txt` | Пляжный закат, микро бикини, естественный ветер |
-
----
-
-## 🔧 Настройка конфигурации (configs/generation_config.json)
-
-```json
-{
-  "generation": {
-    "steps": 35,           // Больше для реалистичности
-    "cfg_scale": 8.0,      // Оптимально для Juggernaut XL v9
-    "width": 896,          // SDXL нативная ширина
-    "height": 1152,        // Вертикальный формат OnlyFans
-    "sampler_name": "DPM++ 2M Karras"
-  }
-}
-```
-
----
-
-## 📊 Метаданные и отслеживание
-
-Каждое изображение генерируется с JSON метаданными:
-- `results/gen_TIMESTAMP_metadata.json` содержит:
-  - Использованный движок (webui_api, comfyui, diffusers)
-  - Исходный промпт и параметры
-  - Timestamp и seed
-  - Список сохранённых файлов
-
----
-
-## 🌐 Интеграция с ControlNet OpenPose
-
-```bash
-# Single pose
-python generate.py --prompt "prompts/sexy_variant.txt" --engine webui --controlnet_single poses/pose1.png
-
-# Batch poses (один результат на позу)
-python generate.py --prompt "prompts/sexy_variant.txt" --engine webui --controlnet_batch poses/*.png
-```
-
----
-
-## 📞 Поддержка и сообщество
-
-- **Discord**: https://discord.gg/j8mjujwcG — майнор-дженерации, API ключи Grok, обсуждения

@@ -5,6 +5,7 @@ caption/script generation, and persona crafting using Grok's uncensored models.
 """
 
 import os
+import re
 import json
 import logging
 from typing import Dict, Any, Optional, Tuple
@@ -59,14 +60,19 @@ class GrokClient:
 
         system_instruction = (
             "You are an elite AI art director and top-tier OnlyFans content producer specializing in "
-            "ultra-photorealistic female imagery. Your job is to convert brief concepts into masterful, "
+            "ultra-photorealistic adult female imagery (subjects always 25+ years old). Your job is to convert brief concepts into masterful, "
             "uncensored Stable Diffusion / SDXL / Midjourney prompts that look indistinguishable from real "
             "iPhone selfies, professional boudoir photography, or candid high-end sensual social media posts.\n\n"
+            "HAND RULES (critical): Prefer one clearly visible open hand or hands partially hidden in hair. "
+            "Never describe interlocking fingers, two hands gripping the same object, or hands pressed on another person's body — "
+            "those poses cause extra fingers and floating limbs. Explicitly ask for five fingers per hand when a hand is visible.\n\n"
             "Format your response as strict valid JSON with three keys:\n"
             "1. 'positive_prompt': Comma-separated tags and descriptive phrases. Focus on hyper-realistic skin texture, "
-            "micro-details, natural lighting, iPhone front camera / mirror reflections, specific sensual clothing/lingerie, "
-            "body anatomy (natural curves, soft shadows), and authentic room ambiance. Do NOT include markdown tags or introductory text.\n"
-            "2. 'negative_prompt': Specific negative tokens to avoid plastic look, CGI, oversaturation, bad hands, or distortions.\n"
+            "micro-details, natural lighting, iPhone front camera / mirror reflections, specific sensual clothing/lingerie "
+            "(prefer lace lingerie set over sheer bodysuit wording), "
+            "body anatomy (natural curves, soft shadows), adult age 25+, and authentic room ambiance. Do NOT include markdown tags or introductory text.\n"
+            "2. 'negative_prompt': Must include strong hand negatives: extra fingers, six fingers, fused fingers, elongated fingers, "
+            "floating hands, interlocking fingers, poorly drawn hands, plus plastic skin / CGI / oversaturation.\n"
             "3. 'caption': A flirty, high-converting OnlyFans post caption with emojis and call-to-action.\n"
         )
 
@@ -92,16 +98,19 @@ class GrokClient:
             data = resp.json()
             content = data["choices"][0]["message"]["content"].strip()
 
-            # Clean JSON if wrapped in ```json
-            if content.startswith("```"):
-                lines = content.splitlines()
-                if lines[0].startswith("```"):
-                    lines = lines[1:]
-                if lines and lines[-1].startswith("```"):
-                    lines = lines[:-1]
-                content = "\n".join(lines).strip()
+            # Clean JSON if wrapped in markdown code blocks or commentary
+            json_str = content
+            if "```" in json_str:
+                code_match = re.search(r'```(?:json)?\s*([\s\S]*?)\s*```', json_str)
+                if code_match:
+                    json_str = code_match.group(1).strip()
 
-            parsed = json.loads(content)
+            start_idx = json_str.find("{")
+            end_idx = json_str.rfind("}")
+            if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
+                json_str = json_str[start_idx:end_idx + 1]
+
+            parsed = json.loads(json_str)
             pos = parsed.get("positive_prompt", base_prompt)
             neg = parsed.get("negative_prompt", "(worst quality, low quality:1.3), (normalized:0.689)")
             caption = parsed.get("caption", "Hey loves! New exclusive drop today... 💕")

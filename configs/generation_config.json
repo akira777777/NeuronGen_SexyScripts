@@ -1,45 +1,26 @@
 {
-  "version": "2.3",
-  "checkpoint": {
-    "name": "Juggernaut_XL_v9.safetensors",
-    "url": "https://huggingface.co/Damian036/Juggernaut_XL_v9/resolve/main/Juggernaut_XL_v9.safetensors",
-    "path": "models/checkpoints/Juggernaut_XL_v9.safetensors"
-  },
-  "fallback_checkpoint": {
-    "name": "RealisticVisionV60B3_v40VAE.safetensors",
-    "url": "https://huggingface.co/RealVisXL/RealisticVisionV60B3_v40VAE/resolve/main/RealisticVisionV60B3_v40VAE.safetensors",
-    "path": "models/checkpoints/RealisticVisionV60B3_v40VAE.safetensors"
-  },
-  "webui_api": {
-    "enabled": true,
-    "host": "http://127.0.0.1:7860",
-    "timeout": 300
+  "webui": {
+    "url": "http://127.0.0.1:7860",
+    "api_key": null,
+    "timeout": 300,
+    "enabled": true
   },
   "generation": {
-    "steps": 35,
-    "cfg_scale": 8.0,
+    "steps": 25,
+    "cfg_scale": 7.0,
     "width": 896,
     "height": 1152,
+    "batch_size": 1,
+    "seed": -1,
+    "sampler": "DPM++ 2M Karras",
     "sampler_name": "DPM++ 2M Karras",
-    "seed": null
-  },
-  "batch": {
-    "size": 1,
-    "max_memory_mb": 4096
-  },
-  "models": {
-    "controlnet_openpose": {
-      "name": "control_v11e_sd15_openpose.pth",
-      "url": "https://huggingface.co/lllyasviel/control_v11e_sd15_openpose/resolve/main/control_v11e_sd15_openpose.pth",
-      "path": "models/controlnet/control_v11e_sd15_openpose.pth"
-    },
-    "upscale_esrgan": {
-      "name": "4x-UltraSharp.onnx",
-      "url": "https://huggingface.co/guoyww/4x-UltraSharp/resolve/main/4x-UlaSharp.onnx",
-      "path": "models/ESRGAN/4x-UltraSharp.onnx"
-    }
+    "model": null
   },
   "prompts": {
+    "positive_separator": ",",
+    "negative_separator": "|",
+    "supports_weights": true,
+    "default_negative_prompt": "(plastic skin, airbrushed, wax figure, CGI, 3D render, cartoon, anime, illustration:1.4), (extra fingers, six fingers, fused fingers, mutated fingers, elongated fingers, deformed hands, poorly drawn hands, floating hands, interlocking fingers, overlapping hands gripping object, missing fingers, mutated limbs, cross-eyed, malformed eyes:1.45), (worst quality, low quality, normal quality:1.3), (monochrome, grayscale, bad anatomy, bad proportions, unnatural body, distorted features:1.2), (overly symmetrical face, doll-like features, artificial lighting, studio perfection:1.1)",
     "default": "best_quality_prompt.txt",
     "variants": [
       "sexy_variant.txt",
@@ -47,9 +28,39 @@
     ]
   },
   "output": {
+    "save_dir": "results",
     "directory": "results",
-    "filename_format": "image_{timestamp}.png",
-    "metadata": true,
-    "upscale": false
+    "filename_format": "{seed}_{timestamp}.png",
+    "overwrite": false,
+    "upscale": false,
+    "onlyfans_optimized": true
+  },
+  "webui_api": {
+    "host": "http://127.0.0.1:7860",
+    "timeout": 300,
+    "enabled": true
+  },
+  "profiles": {
+    "speed": {
+      "label": "Speed",
+      "cfg_scale": 7.0,
+      "steps": 20
+    },
+    "realism": {
+      "label": "Realism / Quality",
+      "cfg_scale": 6.0,
+      "steps": 28,
+      "width": 512,
+      "height": 768,
+      "sampler": "DPM++ 2M Karras",
+      "ban_positive_tokens": [
+        "perfect skin",
+        "airbrushed",
+        "flawless glass skin",
+        "beauty retouch",
+        "porcelain glass skin"
+      ],
+      "notes": "See docs/REALISM_CHECKLIST.md"
+    }
   }
 }

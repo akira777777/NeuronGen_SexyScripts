@@ -11,10 +11,12 @@ Usage:
 """
 
 import argparse
+import unittest
 from pathlib import Path
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from prompt_processor import PromptProcessor
+from demo_renderer import create_demo_artwork
 
 
 def create_test_prompt(archetype="slavic_blonde", scenario="bedroom_morning") -> tuple[str, str]:
@@ -85,10 +87,16 @@ def create_test_prompt(archetype="slavic_blonde", scenario="bedroom_morning") ->
 
 def main():
     parser = argparse.ArgumentParser(description="Photorealistic OnlyFans Style Test Generator")
-    parser.add_argument("--engine", choices=["demo", "webui_api"], default="demo", help="Engine to use")
+    parser.add_argument("--engine", choices=["demo", "webui", "webui_api", "diffusers", "local"], default="demo", help="Engine to use")
     parser.add_argument("--archetype", default="slavic_blonde", help="Character archetype")
     parser.add_argument("--scenario", default="bedroom_morning", help="Scenario/setting")
+    parser.add_argument("--hires_fix", action="store_true", help="Enable High-Resolution Fix for pore-level skin texture")
     args = parser.parse_args()
+
+    if args.engine == "webui":
+        args.engine = "webui_api"
+    elif args.engine == "local":
+        args.engine = "diffusers"
 
     # Generate prompt
     positive_prompt, negative_prompt = create_test_prompt(args.archetype, args.scenario)
@@ -105,10 +113,10 @@ def main():
     norm_prompt, _ = proc.process_prompt(positive_prompt)
     _, inline_params = proc.extract_parameters(positive_prompt)
 
-    steps = inline_params.get("steps", 35)
-    cfg_scale = inline_params.get("cfg_scale", 8.0)
-    width = inline_params.get("width", 896)
-    height = inline_params.get("height", 1152)
+    steps = inline_params.get("steps", 30)
+    cfg_scale = inline_params.get("cfg_scale", 6.5)
+    width = inline_params.get("width", 512)
+    height = inline_params.get("height", 768)
 
     print(f"\nPrompt (first 100 chars): {norm_prompt[:100]}...")
     print(f"Resolution: {width}x{height}")
@@ -118,15 +126,15 @@ def main():
     # Save prompt to file for reference
     output_dir = Path("results/test_photorealistic")
     output_dir.mkdir(parents=True, exist_ok=True)
+    prompt_file = output_dir / f"{args.archetype}_{args.scenario}_prompt.txt"
     
-    with open(output_dir / f"{args.archetype}_{args.scenario}_prompt.txt", "w", encoding="utf-8") as f:
+    with open(prompt_file, "w", encoding="utf-8") as f:
         f.write(f"# {args.archetype} - {args.scenario}\n\n")
         f.write(f"Positive:\n{positive_prompt}\n\n")
         f.write(f"Negative:\n{negative_prompt}")
 
-    print(f"\nPrompt saved to: {output_dir / f'{args.archetype}_{args.scenario}_prompt.txt'}")
+    print(f"\nPrompt saved to: {prompt_file}")
 
-    # Generate image (demo mode for now)
     if args.engine == "demo":
         from PIL import Image, ImageDraw
         
@@ -154,8 +162,44 @@ def main():
         img.save(output_path, format="PNG", compress_level=1)
         
         print(f"\n[OK] Demo preview saved: {output_path}")
-        print("\nTo generate real images with Juggernaut XL v9:")
-        print(f'  python generate.py --prompt "{positive_prompt}" --engine webui_api')
+        print("\nTo generate real images on RTX 4070 Ti:")
+        print(f'  python generate.py --prompt "{prompt_file}" --engine diffusers')
+
+    elif args.engine == "diffusers":
+        from generate import generate_image_diffusers
+        print("\n[INFO] Generating with local PyTorch Diffusers (RTX 4070 Ti)...")
+        output_path = output_dir / f"{args.archetype}_{args.scenario}_diffusers.png"
+        generated = generate_image_diffusers(
+            prompt=norm_prompt,
+            output_path=str(output_path),
+            steps=steps,
+            cfg_scale=cfg_scale,
+            width=width,
+            height=height,
+            seed=42,
+            negative_prompt=negative_prompt,
+            hires_fix=args.hires_fix
+        )
+        if generated:
+            print(f"[OK] Saved: {generated[0]}")
+            meta_data = {
+                "engine": "diffusers",
+                "archetype": args.archetype,
+                "scenario": args.scenario,
+                "timestamp": __import__("datetime").datetime.now().isoformat(),
+                "prompt": norm_prompt,
+                "negative_prompt": negative_prompt,
+                "parameters": {
+                    "steps": steps,
+                    "cfg_scale": cfg_scale,
+                    "width": width,
+                    "height": height,
+                    "seed": 42
+                },
+                "output_files": [str(output_path)]
+            }
+            with open(output_dir / f"{args.archetype}_{args.scenario}_metadata.json", "w", encoding="utf-8") as f:
+                __import__("json").dump(meta_data, f, indent=2)
 
     elif args.engine == "webui_api":
         from config import get_config
@@ -178,7 +222,7 @@ def main():
             width=width,
             height=height,
             batch_size=1,
-            seed=-1,  # Random
+            seed=-1,
         )
 
         if errs:
@@ -211,5 +255,46 @@ def main():
             __import__("json").dump(meta_data, f, indent=2)
 
 
+class TestPhotorealistic(unittest.TestCase):
+    """Unit tests for photorealistic prompt presets and demo rendering."""
+
+    def test_01_prompt_creation_defaults(self):
+        pos, neg = create_test_prompt()
+        self.assertIn("slavic woman", pos)
+        self.assertIn("bedroom", pos)
+        self.assertIn("plastic skin", neg)
+
+    def test_02_all_archetypes_and_scenarios(self):
+        archetypes = ["slavic_blonde", "latina_brunette", "nordic_redhead"]
+        scenarios = ["bedroom_morning", "mirror_selfie", "bikini_poolside"]
+        for arch in archetypes:
+            for scen in scenarios:
+                pos, neg = create_test_prompt(arch, scen)
+                self.assertGreater(len(pos), 50)
+                self.assertGreater(len(neg), 30)
+
+    def test_03_prompt_processor_parsing(self):
+        proc = PromptProcessor()
+        pos, _ = create_test_prompt("latina_brunette", "mirror_selfie")
+        norm, tokens = proc.process_prompt(pos)
+        self.assertTrue(len(tokens) > 0)
+        self.assertIn("latina woman", norm)
+
+    def test_04_demo_artwork_render(self):
+        img = create_demo_artwork(
+            prompt="21yo slavic woman, bedroom selfie",
+            width=512,
+            height=768,
+            steps=25,
+            cfg=7.5,
+            seed=42,
+            index=1
+        )
+        self.assertEqual(img.size, (512, 768))
+
+
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) > 1 and any(arg.startswith("--") for arg in sys.argv[1:]):
+        main()
+    else:
+        unittest.main()

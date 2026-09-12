@@ -52,12 +52,22 @@ class WebUIAPIError(Exception):
         self.status_code = status_code
 
 
-def _is_host_port_open(url: str, timeout: float = 0.5) -> bool:
+def _image_to_base64_png(image: Image.Image) -> str:
+    """Encodes PIL Image to base64 PNG string for WebUI API."""
+    buf = io.BytesIO()
+    image.save(buf, format="PNG")
+    return base64.b64encode(buf.getvalue()).decode("ascii")
+
+
+def _is_host_port_open(url: str, timeout: Optional[float] = None) -> bool:
     """Instantly test if target host:port is listening before making HTTP requests."""
     try:
         parsed = urllib.parse.urlparse(url)
         host = parsed.hostname or "127.0.0.1"
         port = parsed.port or (443 if parsed.scheme == "https" else 80)
+        # Fast adaptive timeout: loopback interfaces don't need 500ms
+        if timeout is None:
+            timeout = 0.05 if host in ["127.0.0.1", "localhost", "::1"] else 0.5
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.settimeout(timeout)
             return s.connect_ex((host, port)) == 0
@@ -169,34 +179,48 @@ class StableDiffusionWebUI:
             "save_images": False,
         }
 
-        # Build ControlNet alwayson_scripts payload
+        # Normalize controlnet_poses to list of tuples
+        normalized_cn_poses: List[Tuple[str, Image.Image]] = []
+        if controlnet_poses:
+            if isinstance(controlnet_poses, tuple) and len(controlnet_poses) == 2 and isinstance(controlnet_poses[1], Image.Image):
+                normalized_cn_poses = [controlnet_poses]
+            elif isinstance(controlnet_poses, Image.Image):
+                normalized_cn_poses = [("", controlnet_poses)]
+            elif isinstance(controlnet_poses, list):
+                for item in controlnet_poses:
+                    if isinstance(item, tuple) and len(item) == 2:
+                        normalized_cn_poses.append(item)
+                    elif isinstance(item, Image.Image):
+                        normalized_cn_poses.append(("", item))
+
+        # Build ControlNet alwayson_scripts payload using official sd-webui-controlnet schema
         cn_payload: Dict[str, Any] = {}
-        if controlnet_poses and len(controlnet_poses) == 1:
-            # Single pose - standard ControlNet format
-            pose_path, pose_img = controlnet_poses[0]
+        if normalized_cn_poses:
+            cn_args = []
+            for _, pose_img in normalized_cn_poses:
+                cn_args.append({
+                    "input_image": _image_to_base64_png(pose_img),
+                    "module": "openpose",
+                    "model": "control_v11e_sd15_openpose",
+                    "weight": 1.0,
+                    "resize_mode": "Crop and Resize",
+                    "low_vram": False,
+                    "processor_res": max(width, height),
+                    "guidance_start": 0.0,
+                    "guidance_end": 1.0,
+                    "control_mode": "Balanced",
+                    "pixel_perfect": True,
+                    "enabled": True
+                })
             cn_payload = {
-                "scripts": [{
-                    "args": {
-                        "preprocessor": "openpose",
-                        "image": base64.b64encode(pose_img.tobytes()).decode("ascii")
-                    }
-                }]
-            }
-        elif controlnet_poses and len(controlnet_poses) > 1:
-            # Multiple poses - batch format
-            cn_payload = {
-                "scripts": [{
-                    "args": {
-                        "preprocessor": "openpose",
-                        "images": [base64.b64encode(pose_img.tobytes()).decode("ascii") for _, pose_img in controlnet_poses]
-                    }
-                }]
+                "controlnet": {
+                    "args": cn_args
+                }
             }
         
         if alwayson_scripts:
             cn_payload.update(alwayson_scripts)
-        elif cn_payload and "scripts" not in payload.get("alwayson_scripts", {}):
-            # Inject ControlNet via alwayson_scripts
+        if cn_payload:
             payload["alwayson_scripts"] = cn_payload
         
         if extra_args:
@@ -214,14 +238,17 @@ class StableDiffusionWebUI:
             response.raise_for_status()
             result = response.json()
 
-            raw_images = result.get("images", [])
+            raw_images = result.get("images") or []
             # Use tqdm for progress indication during batch download
             for raw_b64 in tqdm(raw_images, desc="Downloading images..."):
-                if "," in raw_b64:
-                    raw_b64 = raw_b64.split(",", 1)[1]
-                img_bytes = base64.b64decode(raw_b64)
-                img = Image.open(io.BytesIO(img_bytes)).convert("RGB")
-                images.append(img)
+                try:
+                    if "," in raw_b64:
+                        raw_b64 = raw_b64.split(",", 1)[1]
+                    img_bytes = base64.b64decode(raw_b64)
+                    img = Image.open(io.BytesIO(img_bytes)).convert("RGB")
+                    images.append(img)
+                except Exception as img_err:
+                    errors.append(f"Failed to decode image: {img_err}")
 
             info_dict = {
                 "parameters": result.get("parameters", {}),
@@ -245,6 +272,48 @@ class StableDiffusionWebUI:
             errors.append(err)
 
         return [], {}, errors
+
+    def select_juggernaut_xl_v9(self) -> bool:
+        """Select Juggernaut XL v9 checkpoint in WebUI (ONLYFANS photorealism standard)."""
+        try:
+            # Get list of models from WebUI
+            r = self.session.get(f"{self.base_url}{self.MODELS_ENDPOINT}", timeout=10)
+            if r.status_code != 200:
+                print(f"[WebUI] [WARN] Could not fetch model list: {r.status_code}")
+                return False
+            
+            models_data = r.json()
+            
+            # Find Juggernaut XL v9 (or closest match)
+            juggernaut_xl_v9 = None
+            for model in models_data:
+                name_lower = str(model.get("title", "")).lower()
+                if "juggernaut" in name_lower and ("xl" in name_lower or "xl v9" in name_lower):
+                    juggernaut_xl_v9 = model.get("sha256") or model.get("title")
+                    break
+            
+            # Fallback to any XL model
+            if not juggernaut_xl_v9:
+                for model in models_data:
+                    name_lower = str(model.get("title", "")).lower()
+                    if "xl" in name_lower and model.get("snapshots", []):
+                        juggernaut_xl_v9 = model.get("sha256") or model.get("title")
+                        break
+            
+            if juggernaut_xl_v9:
+                # Set as override setting (WebUI will handle the actual selection)
+                payload = {"override_settings": {"sd_model_checkpoint": juggernaut_xl_v9}}
+                r = self.session.post(f"{self.base_url}/sdapi/v1/options", json=payload, timeout=10)
+                if r.status_code in [200, 201]:
+                    print(f"[WebUI] [OK] Juggernaut XL v9 selected: {juggernaut_xl_v9}")
+                    return True
+            
+            print("[WebUI] [WARN] No Juggernaut XL v9 model found — WebUI will use default")
+            return False
+
+        except Exception as e:
+            print(f"[WebUI] [ERROR] Failed to select model: {e}")
+            return False
 
     def ensure_controlnet_extension_loaded(self) -> bool:
         """

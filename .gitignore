@@ -31,3 +31,19 @@ results/*.json
 .idea/
 .DS_Store
 Thumbs.db
+
+# Local smoke / debug artifacts
+out*.txt
+test_*.png
+_patch_*.py
+
+# Pytest cache
+.pytest_cache/
+
+# Nested generation / QA artifacts
+results/**/*.png
+results/**/*.jpg
+results/**/*.json
+results/run_*.json
+!results/.gitkeep
+!results/**/.gitkeep

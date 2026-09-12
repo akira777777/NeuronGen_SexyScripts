@@ -27,7 +27,18 @@ class BatchGenerator:
     """High-performance batch generation orchestrator."""
 
     def __init__(self, config: Optional[dict] = None):
-        self.config = config or get_config()
+        base_cfg = get_config()
+        if config:
+            merged_cfg = base_cfg.copy()
+            for k, v in config.items():
+                if isinstance(v, dict) and k in merged_cfg and isinstance(merged_cfg[k], dict):
+                    merged_cfg[k] = {**merged_cfg[k], **v}
+                else:
+                    merged_cfg[k] = v
+            self.config = merged_cfg
+        else:
+            self.config = base_cfg
+
         self.webui = StableDiffusionWebUI(self.config)
         self.prompt_processor = PromptProcessor(self.config)
 
@@ -92,7 +103,7 @@ class BatchGenerator:
 
             if engine.lower() in ["demo", "test"]:
                 # Demo preview rendering
-                from main import create_demo_artwork
+                from demo_renderer import create_demo_artwork
                 for idx in range(1, b_size + 1):
                     images.append(create_demo_artwork(
                         prompt=norm_prompt,
@@ -106,17 +117,42 @@ class BatchGenerator:
             elif engine.lower() in ["diffusers", "local"]:
                 from generate import generate_image_diffusers
                 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                out_path = str(self.output_dir / f"{output_prefix}_{timestamp}_{p_idx}.png")
-                gen_paths = generate_image_diffusers(
-                    prompt=norm_prompt,
-                    output_path=out_path,
-                    steps=actual_steps,
-                    cfg_scale=actual_cfg,
-                    width=actual_width,
-                    height=actual_height,
-                    seed=actual_seed
-                )
-                saved_files.extend(gen_paths)
+                for b_idx in range(1, b_size + 1):
+                    suffix = f"_{b_idx}" if b_size > 1 else ""
+                    out_path = str(self.output_dir / f"{output_prefix}_{timestamp}_{p_idx}{suffix}.png")
+                    cur_seed = actual_seed + b_idx - 1 if actual_seed >= 0 else None
+                    gen_paths = generate_image_diffusers(
+                        prompt=norm_prompt,
+                        output_path=out_path,
+                        steps=actual_steps,
+                        cfg_scale=actual_cfg,
+                        width=actual_width,
+                        height=actual_height,
+                        seed=cur_seed,
+                        negative_prompt=neg_prompt
+                    )
+                    if gen_paths:
+                        for g_path in gen_paths:
+                            saved_files.append(g_path)
+                            meta_filepath = Path(g_path).with_name(Path(g_path).stem + "_metadata.json")
+                            meta_data = {
+                                "timestamp": datetime.now().isoformat(),
+                                "prompt": norm_prompt,
+                                "negative_prompt": neg_prompt,
+                                "parameters": {
+                                    "steps": actual_steps,
+                                    "cfg_scale": actual_cfg,
+                                    "width": actual_width,
+                                    "height": actual_height,
+                                    "seed": cur_seed if cur_seed is not None else -1,
+                                    "sampler": self.default_sampler,
+                                    "engine": "diffusers"
+                                },
+                                "elapsed_sec": round(time.perf_counter() - t_prompt_start, 3),
+                                "info": "PyTorch Diffusers Local"
+                            }
+                            with open(meta_filepath, "w", encoding="utf-8") as f:
+                                json.dump(meta_data, f, indent=2, ensure_ascii=False)
                 continue
             else:
                 # Automatic1111 WebUI API
