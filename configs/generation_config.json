@@ -33,6 +33,7 @@
     "filename_format": "{seed}_{timestamp}.png",
     "overwrite": false,
     "upscale": false,
+    "hires_fix": true,
     "onlyfans_optimized": true
   },
   "webui_api": {
