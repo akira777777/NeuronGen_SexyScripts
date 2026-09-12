@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NeuronGen — AI Content Studio</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0a0f;
+      color: #fff;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .hero { text-align: center; padding: 2rem; }
+    h1 { font-size: 3rem; background: linear-gradient(135deg, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    p { color: #888; margin-top: 1rem; font-size: 1.1rem; }
+    .status { margin-top: 2rem; padding: 1rem 2rem; background: #1a1a2e; border-radius: 12px; border: 1px solid #333; }
+    .status span { color: #4ade80; }
+    a { color: #a855f7; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <h1>NeuronGen Studio</h1>
+    <p>AI-powered content generation platform</p>
+    <div class="status">
+      API: <a href="/api/health">/api/health</a> &nbsp;|&nbsp;
+      Content: <a href="/api/content">/api/content</a> &nbsp;|&nbsp;
+      DB: <span>Supabase Connected ✓</span>
+    </div>
+  </div>
+</body>
+</html>
