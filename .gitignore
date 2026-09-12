@@ -47,3 +47,5 @@ results/**/*.json
 results/run_*.json
 !results/.gitkeep
 !results/**/.gitkeep
+.vercel
+.env*
